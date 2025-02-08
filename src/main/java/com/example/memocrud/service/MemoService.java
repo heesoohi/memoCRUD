@@ -6,6 +6,7 @@ import com.example.memocrud.entity.Memo;
 import com.example.memocrud.repository.MemoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,14 @@ public class MemoService {
 
     private final MemoRepository memoRepository;
 
+    @Transactional
     public MemoResponseDto saveMemo(MemoRequestDto requestDto) {
         Memo memo = new Memo(requestDto.getContent());
         Memo savedmemo = memoRepository.save(memo);
         return new MemoResponseDto(savedmemo.getId(), savedmemo.getContent());
     }
 
+    @Transactional(readOnly = true)
     public List<MemoResponseDto> findAll() {
         List<Memo> memos = memoRepository.findAll();
 
@@ -34,6 +37,7 @@ public class MemoService {
         return memoResponseDtos;
     }
 
+    @Transactional(readOnly = true)
     public MemoResponseDto findById(Long id) {
         Memo memo = memoRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("해당 id에 맞는 메모가 없습니다")
@@ -41,6 +45,7 @@ public class MemoService {
         return new MemoResponseDto(memo.getId(), memo.getContent());
     }
 
+    @Transactional
     public MemoResponseDto updateMemo(Long id, MemoRequestDto dto) {
         Memo memo = memoRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("해당 id에 맞는 메모가 없습니다")
@@ -49,6 +54,7 @@ public class MemoService {
         return new MemoResponseDto(memo.getId(), memo.getContent());
     }
 
+    @Transactional
     public void deleteMemo(Long id) {
         if(!memoRepository.existsById(id)) {
             throw new IllegalArgumentException("해당 아이디에 맞는 메모 없음");
